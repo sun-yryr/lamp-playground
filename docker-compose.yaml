@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  mysql:
+    build: ./docker/mysql
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: 'sample'
+      TZ: 'Asia/Tokyo'
+    ports: 
+      - 13302:3306
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "8080:80"
+
+  php-apache:
+    build: ./docker/php
+    volumes:
+      - ./html:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "8000:80"
+    depends_on:
+      - mysql
